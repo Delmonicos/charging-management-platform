@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { Doughnut } from 'react-chartjs-2';
@@ -13,8 +13,8 @@ import {
   makeStyles,
   useTheme
 } from '@material-ui/core';
+import axios from 'axios';
 import LaptopMacIcon from '@material-ui/icons/LaptopMac';
-import PhoneIcon from '@material-ui/icons/Phone';
 import TabletIcon from '@material-ui/icons/Tablet';
 
 const useStyles = makeStyles(() => ({
@@ -23,25 +23,136 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
+const GetPayementConsent = (setPayementConsents) => {
+  const config = {
+    method: 'get',
+    url: 'https://bf5h52pjn2sju5jji4hz-elasticsearch.services.clever-cloud.com/payment-consent/_search',
+    headers: {
+      Origin: 'http://test.com',
+      Authorization: 'Basic dWVGanQ0S0hBNHR1bVRsTjRQbjg6OTFoNFMybVBqUTlKS1czWmN2MmE='
+    }
+  };
+
+  axios(config)
+    .then((response) => {
+      setPayementConsents(response.data.hits.hits);
+      console.log('Payement consent data is correctly recover');
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const GetPayement = (setPayement) => {
+  const config = {
+    method: 'get',
+    url: 'https://bf5h52pjn2sju5jji4hz-elasticsearch.services.clever-cloud.com/payments/_search',
+    headers: {
+      Authorization: 'Basic dWVGanQ0S0hBNHR1bVRsTjRQbjg6OTFoNFMybVBqUTlKS1czWmN2MmE='
+    }
+  };
+
+  axios(config)
+    .then((response) => {
+      setPayement(response.data.hits.hits);
+      console.log('Payement data is correctly recover');
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const GetChargeSession = (setChargeSessions) => {
+  const config = {
+    method: 'get',
+    url: 'https://bf5h52pjn2sju5jji4hz-elasticsearch.services.clever-cloud.com/charge-session/_search',
+    headers: {
+      Authorization: 'Basic dWVGanQ0S0hBNHR1bVRsTjRQbjg6OTFoNFMybVBqUTlKS1czWmN2MmE='
+    }
+  };
+
+  axios(config)
+    .then((response) => {
+      setChargeSessions(response.data.hits.hits);
+      console.log('Charge session data is correctly recover');
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const MapData = (payementConsents, payements, chargeSessions) => {
+  const cs = chargeSessions.map((_cs) => {
+    const p = payements.find((_p) => _p._source.session_id === _cs._source.session_id);
+    return {
+      user: _cs._source.user,
+      charger: _cs._source.charger,
+      session_id: _cs._source.session_id,
+      kwh: _cs._source.kwh,
+      amount: p._source.amount?.amount || 0,
+      duration: _cs._source.duration,
+      cs_timestamp: _cs._source.timestamp,
+      p_timestamp: p._source.timestamp?.p_timestamp || 0,
+    };
+  });
+  const tmp = cs.map((_cs) => {
+    const pc = payementConsents.find((_pc) => _pc._source.user === _cs.user);
+    return {
+      user: _cs.user,
+      charger: _cs.charger,
+      session_id: _cs.session_id,
+      kwh: _cs.kwh,
+      amount: _cs.amount,
+      duration: _cs.duration,
+      bic: pc._source.bic?.bic || 0,
+      iban: pc._source.iban?.iban || 0,
+      cs_timestamp: _cs.timestamp,
+      pc_timestamp: pc._source.timestamp?.pc_timestamp || 0,
+      p_timestamp: _cs.timestamp,
+    };
+  });
+  return (tmp);
+};
+
 const TrafficByDevice = ({ className, ...rest }) => {
   const classes = useStyles();
   const theme = useTheme();
 
+  const [payementConsents, setPayementConsents] = useState([]);
+  const [payements, setPayements] = useState([]);
+  const [chargeSessions, setChargeSessions] = useState([]);
+
+  useEffect(() => {
+    GetPayementConsent(setPayementConsents);
+    GetPayement(setPayements);
+    GetChargeSession(setChargeSessions);
+  }, []);
+
+  const tmp = MapData(payementConsents, payements, chargeSessions);
+
+  const duration = tmp.map((item) => {
+    return (item.duration);
+  });
+  const allDuration = duration.reduce((_ad, _d) => _ad + _d, 0);
+  const libre = 86400 - (allDuration / duration.length);
+  const occupe = allDuration / duration.length;
+  const pLibre = (libre * 100) / 86400;
+  const pOccupe = (occupe * 100) / 86400;
+
   const data = {
     datasets: [
       {
-        data: [63, 15, 22],
+        data: [libre, occupe],
         backgroundColor: [
           colors.indigo[500],
           colors.red[600],
-          colors.orange[600]
         ],
         borderWidth: 8,
         borderColor: colors.common.white,
         hoverBorderColor: colors.common.white
       }
     ],
-    labels: ['Desktop', 'Tablet', 'Mobile']
+    labels: ['Libre', 'Occupé']
   };
 
   const options = {
@@ -68,23 +179,17 @@ const TrafficByDevice = ({ className, ...rest }) => {
 
   const devices = [
     {
-      title: 'Desktop',
-      value: 63,
+      title: 'PDC Libre',
+      value: pLibre.toFixed(0),
       icon: LaptopMacIcon,
       color: colors.indigo[500]
     },
     {
-      title: 'Tablet',
-      value: 15,
+      title: 'PDC Occupé',
+      value: pOccupe.toFixed(0),
       icon: TabletIcon,
       color: colors.red[600]
     },
-    {
-      title: 'Mobile',
-      value: 23,
-      icon: PhoneIcon,
-      color: colors.orange[600]
-    }
   ];
 
   return (
@@ -92,7 +197,7 @@ const TrafficByDevice = ({ className, ...rest }) => {
       className={clsx(classes.root, className)}
       {...rest}
     >
-      <CardHeader title="Traffic by Device" />
+      <CardHeader title="Occupation des points de charge" />
       <Divider />
       <CardContent>
         <Box
