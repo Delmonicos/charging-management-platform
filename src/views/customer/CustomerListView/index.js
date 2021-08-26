@@ -7,7 +7,6 @@ import {
 import axios from 'axios';
 import Page from 'src/components/Page';
 import Results from './Results';
-import Toolbar from './Toolbar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,19 +78,25 @@ const GetChargeSession = (setChargeSessions) => {
 const MapData = (payementConsents, payements, chargeSessions) => {
   const cs = chargeSessions.map((_cs) => {
     const p = payements.find((_p) => _p._source.session_id === _cs._source.session_id);
+    if (!p) {
+      return (0);
+    }
     return {
       user: _cs._source.user,
       charger: _cs._source.charger,
       session_id: _cs._source.session_id,
       kwh: _cs._source.kwh,
-      amount: p._source.amount?.amount || 0,
+      amount: p._source.amount?.amount,
       duration: _cs._source.duration,
       cs_timestamp: _cs._source.timestamp,
-      p_timestamp: p._source.timestamp?.p_timestamp || 0,
+      p_timestamp: p._source.timestamp?.p_timestamp,
     };
   });
   const tmp = cs.map((_cs) => {
     const pc = payementConsents.find((_pc) => _pc._source.user === _cs.user);
+    if (!pc) {
+      return (0);
+    }
     return {
       user: _cs.user,
       charger: _cs.charger,
@@ -99,10 +104,10 @@ const MapData = (payementConsents, payements, chargeSessions) => {
       kwh: _cs.kwh,
       amount: _cs.amount,
       duration: _cs.duration,
-      bic: pc._source.bic?.bic || 0,
-      iban: pc._source.iban?.iban || 0,
+      bic: pc._source.bic?.bic,
+      iban: pc._source.iban?.iban,
       cs_timestamp: _cs.timestamp,
-      pc_timestamp: pc._source.timestamp?.pc_timestamp || 0,
+      pc_timestamp: pc._source.timestamp?.pc_timestamp,
       p_timestamp: _cs.timestamp,
     };
   });
@@ -121,7 +126,7 @@ const CustomerListView = () => {
     GetChargeSession(setChargeSessions);
   }, []);
 
-  const tmp = MapData(payementConsents, payements, chargeSessions);
+  const data = MapData(payementConsents, payements, chargeSessions);
 
   return (
     <Page
@@ -129,9 +134,8 @@ const CustomerListView = () => {
       title="Customers"
     >
       <Container maxWidth={false}>
-        <Toolbar />
         <Box mt={3}>
-          <Results customers={tmp} />
+          <Results customers={data} />
         </Box>
       </Container>
     </Page>

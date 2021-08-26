@@ -84,6 +84,9 @@ const GetChargeSession = (setChargeSessions) => {
 const MapData = (payementConsents, payements, chargeSessions) => {
   const cs = chargeSessions.map((_cs) => {
     const p = payements.find((_p) => _p._source.session_id === _cs._source.session_id);
+    if (!p) {
+      return (0);
+    }
     return {
       user: _cs._source.user,
       charger: _cs._source.charger,
@@ -97,6 +100,9 @@ const MapData = (payementConsents, payements, chargeSessions) => {
   });
   const tmp = cs.map((_cs) => {
     const pc = payementConsents.find((_pc) => _pc._source.user === _cs.user);
+    if (!pc) {
+      return (0);
+    }
     return {
       user: _cs.user,
       charger: _cs.charger,
