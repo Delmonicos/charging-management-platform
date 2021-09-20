@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const CreateCharger = () => {
+const ManageTariff = () => {
   const classes = useStyles();
   const [tarif, setTarif] = useState('');
   const [newTarif, setNewTarif] = useState('');
@@ -38,18 +38,6 @@ const CreateCharger = () => {
       .then(() => getTariff())
   };
 
-  const addNewCharger = () => {
-    const chargerKeypair = KeyringService.generateNewChargerKey();
-    DelmonicosService
-      .addChargerLocation(19,20,chargerKeypair.chargerKeypair)
-      .then(() => {
-        return DelmonicosService.addNewCharger(chargerKeypair.address);
-      })
-      .then(() => {
-        console.log(`Charger ${chargerKeypair.address} added to the chain.`);
-      });
-  };
-
   useEffect(() => getTariff(), []);
 
   return (
@@ -64,12 +52,9 @@ const CreateCharger = () => {
           <input placeholder="nouveau tarif" onChange={(e) => setNewTarif(e.target.value)} value={newTarif} />
         </Box>
         <button type="button" onClick={() => handleInput(newTarif)}>Input</button>
-        
-
-        <button type="button" onClick={() => addNewCharger()}>Add new charger</button>
       </Container>
     </Page>
   );
 };
 
-export default CreateCharger;
+export default ManageTariff;

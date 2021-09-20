@@ -71,7 +71,6 @@ class KeyringService {
       address: chargerKeypair.address,
     };
   }
-
 }
 
 export default new KeyringService();

@@ -106,8 +106,6 @@ class Delmonicos {
         .catch(reject);
     });
   }
-
-
 }
 
 export default new Delmonicos();
