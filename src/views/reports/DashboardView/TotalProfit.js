@@ -138,7 +138,7 @@ const TotalProfit = ({ className, ...rest }) => {
   const amount = tmp.map((item) => {
     return (item.amount);
   });
-  const allAmount = amount.reduce((_aa, _a) => _aa + _a, 0);
+  const allAmount = amount.reduce((_aa, _a) => _aa + (_a || 0), 0);
 
   return (
     <Card

@@ -138,7 +138,7 @@ const TasksProgress = ({ className, ...rest }) => {
   const kwh = tmp.map((item) => {
     return (item.kwh);
   });
-  const allKwh = kwh.reduce((_ak, _k) => _ak + _k, 0);
+  const allKwh = kwh.reduce((_ak, _k) => _ak + (_k || 0), 0);
 
   return (
     <Card
