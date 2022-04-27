@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
+import {
+  Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, ArcElement
+} from 'chart.js';
 import {
   Box,
   Button,
@@ -16,6 +19,8 @@ import {
 import axios from 'axios';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, ArcElement);
 
 const useStyles = makeStyles(() => ({
   root: {}
@@ -170,7 +175,7 @@ const Sales = ({ className, ...rest }) => {
     maintainAspectRatio: false,
     responsive: true,
     scales: {
-      xAxes: [
+      x: [
         {
           barThickness: 12,
           maxBarThickness: 10,
@@ -179,20 +184,20 @@ const Sales = ({ className, ...rest }) => {
           ticks: {
             fontColor: theme.palette.text.secondary
           },
-          gridLines: {
+          grid: {
             display: false,
             drawBorder: false
           }
         }
       ],
-      yAxes: [
+      y: [
         {
           ticks: {
             fontColor: theme.palette.text.secondary,
             beginAtZero: true,
             min: 0
           },
-          gridLines: {
+          grid: {
             borderDash: [2],
             borderDashOffset: [2],
             color: theme.palette.divider,
@@ -240,7 +245,8 @@ const Sales = ({ className, ...rest }) => {
           height={400}
           position="relative"
         >
-          <Line
+          <Chart
+            type="line"
             data={data}
             options={options}
           />
