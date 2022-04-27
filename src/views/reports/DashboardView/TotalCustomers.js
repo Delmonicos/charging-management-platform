@@ -18,7 +18,6 @@ const GetPayementConsent = (setPayementConsents) => {
     method: 'get',
     url: 'https://bf5h52pjn2sju5jji4hz-elasticsearch.services.clever-cloud.com/payment-consent/_search',
     headers: {
-      Origin: 'http://test.com',
       Authorization: 'Basic dWVGanQ0S0hBNHR1bVRsTjRQbjg6OTFoNFMybVBqUTlKS1czWmN2MmE='
     }
   };
