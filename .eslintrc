@@ -1,15 +1,24 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "env": {
     "es6": true,
     "browser": true
   },
-  "extends": ["airbnb", "airbnb/hooks", "eslint:recommended"],
+  "extends": [
+    "airbnb",
+    "airbnb/hooks",
+    "eslint:recommended"
+  ],
   "settings": {
     "import/resolver": {
       "node": {
-        "paths": ["src"],
-        "extensions": [".js", ".jsx"]
+        "paths": [
+          "src"
+        ],
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
       }
     }
   },
@@ -17,7 +26,12 @@
     "no-underscore-dangle": "off",
     "arrow-body-style": "off",
     "comma-dangle": "off",
-    "import/no-unresolved": "off",
+    "import/no-unresolved": [
+      2,
+      {
+        "caseSensitive": false
+      }
+    ],
     "jsx-a11y/anchor-is-valid": "off",
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/control-has-associated-label": "off",

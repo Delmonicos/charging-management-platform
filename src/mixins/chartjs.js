@@ -1,4 +1,8 @@
-import { Chart } from 'react-chartjs-2';
+import { BarElement, Chart } from 'chart.js';
+
+Chart.register(
+  BarElement
+);
 
 // ChartJS extension rounded bar chart
 // https://codepen.io/jedtrow/full/ygRYgo
@@ -186,6 +190,6 @@ function draw() {
   }
 }
 
-Chart.helpers.extend(Chart.elements.Rectangle.prototype, {
+Object.assign(BarElement.prototype, {
   draw
 });
