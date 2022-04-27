@@ -156,7 +156,7 @@ const TotalCustomers = ({ className, ...rest }) => {
       <CardContent>
         <Grid
           container
-          justify="space-between"
+          justifyContent="space-between"
           spacing={3}
         >
           <Grid item>
