@@ -143,10 +143,8 @@ const Budget = ({ className, ...rest }) => {
   const tmp = MapData(payementConsents, payements, chargeSessions);
 
   const duration = tmp.map((item) => {
-    console.log(item);
     return (item.duration);
   });
-  console.log(duration);
   const allDuration = duration.reduce((_ad, _d) => _ad + (_d || 0), 0);
 
   return (

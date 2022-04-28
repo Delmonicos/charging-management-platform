@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { Chart } from 'react-chartjs-2';
 import {
-  Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, ArcElement
+  Chart as ChartJS, CategoryScale, LinearScale, PointElement, ArcElement, BarElement
 } from 'chart.js';
 import {
   Box,
@@ -20,7 +20,7 @@ import axios from 'axios';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, ArcElement);
+ChartJS.register(CategoryScale, LinearScale, PointElement, ArcElement, BarElement);
 
 const useStyles = makeStyles(() => ({
   root: {}
@@ -156,12 +156,20 @@ const Sales = ({ className, ...rest }) => {
       {
         backgroundColor: colors.indigo[500],
         data: kwh,
-        label: 'kwh'
+        label: 'kwh',
+        barThickness: 12,
+        maxBarThickness: 10,
+        barPercentage: 0.5,
+        categoryPercentage: 0.5
       },
       {
         backgroundColor: colors.grey[200],
         data: duration,
-        label: 'duration'
+        label: 'duration',
+        barThickness: 12,
+        maxBarThickness: 10,
+        barPercentage: 0.5,
+        categoryPercentage: 0.5
       }
     ],
     labels: amount
@@ -175,39 +183,31 @@ const Sales = ({ className, ...rest }) => {
     maintainAspectRatio: false,
     responsive: true,
     scales: {
-      x: [
-        {
-          barThickness: 12,
-          maxBarThickness: 10,
-          barPercentage: 0.5,
-          categoryPercentage: 0.5,
-          ticks: {
-            fontColor: theme.palette.text.secondary
-          },
-          grid: {
-            display: false,
-            drawBorder: false
-          }
+      x: {
+        ticks: {
+          fontColor: theme.palette.text.secondary
+        },
+        grid: {
+          display: false,
+          drawBorder: false
         }
-      ],
-      y: [
-        {
-          ticks: {
-            fontColor: theme.palette.text.secondary,
-            beginAtZero: true,
-            min: 0
-          },
-          grid: {
-            borderDash: [2],
-            borderDashOffset: [2],
-            color: theme.palette.divider,
-            drawBorder: false,
-            zeroLineBorderDash: [2],
-            zeroLineBorderDashOffset: [2],
-            zeroLineColor: theme.palette.divider
-          }
+      },
+      y: {
+        ticks: {
+          fontColor: theme.palette.text.secondary,
+          beginAtZero: true,
+          min: 0
+        },
+        grid: {
+          borderDash: [2],
+          borderDashOffset: [2],
+          color: theme.palette.divider,
+          drawBorder: false,
+          zeroLineBorderDash: [2],
+          zeroLineBorderDashOffset: [2],
+          zeroLineColor: theme.palette.divider
         }
-      ]
+      }
     },
     tooltips: {
       backgroundColor: theme.palette.background.default,
@@ -246,7 +246,7 @@ const Sales = ({ className, ...rest }) => {
           position="relative"
         >
           <Chart
-            type="line"
+            type="bar"
             data={data}
             options={options}
           />
