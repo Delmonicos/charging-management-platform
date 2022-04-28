@@ -60,7 +60,7 @@ const Results = ({ className, customers, ...rest }) => {
             </TableHead>
             <TableBody>
               {customers.slice(0, limit).map((customer) => (
-                <TableRow>
+                <TableRow key={customer.index}>
                   <TableCell>
                     {customer.user}
                   </TableCell>
@@ -82,8 +82,8 @@ const Results = ({ className, customers, ...rest }) => {
       <TablePagination
         component="div"
         count={customers.length}
-        onChangePage={handlePageChange}
-        onChangeRowsPerPage={handleLimitChange}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleLimitChange}
         page={page}
         rowsPerPage={limit}
         rowsPerPageOptions={[5, 10, 25]}

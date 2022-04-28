@@ -78,7 +78,7 @@ const MapData = (payementConsents, payements, chargeSessions) => {
   const cs = chargeSessions.map((_cs) => {
     const p = payements.find((_p) => _p._source.session_id === _cs._source.session_id);
     if (!p) {
-      return (0);
+      return (null);
     }
     return {
       user: _cs._source.user,
@@ -88,13 +88,20 @@ const MapData = (payementConsents, payements, chargeSessions) => {
       amount: p._source.amount?.amount,
       duration: _cs._source.duration,
       cs_timestamp: _cs._source.timestamp,
-      p_timestamp: p._source.timestamp?.p_timestamp,
+      p_timestamp: p._source.timestamp?.p_timestamp
     };
   });
-  const tmp = cs.map((_cs) => {
+  const tmp = cs.map((_cs, i) => {
+    if (!_cs) {
+      return ({
+        index: i
+      });
+    }
     const pc = payementConsents.find((_pc) => _pc._source.user === _cs.user);
     if (!pc) {
-      return (0);
+      return ({
+        index: i
+      });
     }
     return {
       user: _cs.user,
