@@ -56,7 +56,7 @@ const ManageTariff = () => {
           <p>Tarif actuelle pour les bornes Delmonicos : {tarif} €</p>
           <p>&nbsp;</p>
           <input disabled={waiting} placeholder="nouveau tarif" onChange={(e) => setNewTarif(e.target.value)} value={newTarif} />
-          <button style={{marginLeft: 5 + 'px'}} type="button" onClick={() => handleInput(newTarif)}>{!waiting ? "save" : "waiting..."}</button>
+          <button style={{marginLeft: 5 + 'px', paddingLeft: 5 + 'px', paddingRight: 5 + 'px'}} type="button" onClick={() => handleInput(newTarif)}>{!waiting ? "Sauvegarder le tarif" : "loading..."}</button>
         </Box>
       </Container>
     </Page>

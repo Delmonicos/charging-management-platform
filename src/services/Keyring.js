@@ -61,7 +61,7 @@ class KeyringService {
     window.localStorage.setItem('mnemonic', value);
   }
 
-  generateNewChargerKey() {
+  async generateNewChargerKey() {
     const mnemonic = mnemonicGenerate();
     const keyring = new Keyring({ type: 'sr25519' });
     const chargerKeypair = keyring.addFromMnemonic(mnemonic);
