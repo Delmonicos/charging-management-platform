@@ -45,19 +45,19 @@ const Results = ({ className, customers, ...rest }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  User Id
+                  Identifiant utilisateur
                 </TableCell>
                 <TableCell>
-                  Total Sessions Number
+                  Nombre total de sessions
                 </TableCell>
                 <TableCell>
-                  Total kwh
+                  Total des charges en kwh
                 </TableCell>
                 <TableCell>
-                  Total amount
+                  Montant payé total
                 </TableCell>
                 <TableCell>
-                  Total duration
+                  Durée de charge totale
                 </TableCell>
               </TableRow>
             </TableHead>
