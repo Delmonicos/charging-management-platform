@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { Chart } from 'react-chartjs-2';
 import {
-  Chart as ChartJS, CategoryScale, LinearScale, PointElement, ArcElement, BarElement
+  Chart as ChartJS, CategoryScale, LinearScale, PointElement, ArcElement, LineElement
 } from 'chart.js';
 import {
   Box,
@@ -20,7 +20,7 @@ import axios from 'axios';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, ArcElement, BarElement);
+ChartJS.register(CategoryScale, LinearScale, PointElement, ArcElement, LineElement);
 
 const useStyles = makeStyles(() => ({
   root: {}
@@ -138,6 +138,7 @@ const Sales = ({ className, ...rest }) => {
 
   const tmp = MapData(payementConsents, payements, chargeSessions);
 
+  console.log(tmp);
   const kwh = tmp.map((item) => {
     return (item.kwh);
   });
@@ -155,7 +156,7 @@ const Sales = ({ className, ...rest }) => {
     datasets: [
       {
         backgroundColor: colors.indigo[500],
-        data: kwh,
+        data: [18, 5, 19, 27, 29, 19, 20],
         label: 'kwh',
         barThickness: 12,
         maxBarThickness: 10,
@@ -164,7 +165,7 @@ const Sales = ({ className, ...rest }) => {
       },
       {
         backgroundColor: colors.grey[200],
-        data: duration,
+        data: [11, 20, 12, 29, 30, 25, 13],
         label: 'duration',
         barThickness: 12,
         maxBarThickness: 10,
@@ -172,7 +173,7 @@ const Sales = ({ className, ...rest }) => {
         categoryPercentage: 0.5
       }
     ],
-    labels: amount
+    labels: ['1 Aug', '2 Aug', '3 Aug', '4 Aug', '5 Aug', '6 Aug']
   };
 
   const options = {
@@ -246,7 +247,7 @@ const Sales = ({ className, ...rest }) => {
           position="relative"
         >
           <Chart
-            type="bar"
+            type="line"
             data={data}
             options={options}
           />
