@@ -23,6 +23,7 @@ const ManageTariff = () => {
   const classes = useStyles();
   const [tarif, setTarif] = useState('');
   const [newTarif, setNewTarif] = useState('');
+  const [waiting, setWaiting] = useState(false);
 
   const getTariff = () => {
     DelmonicosService
@@ -33,9 +34,14 @@ const ManageTariff = () => {
   };
 
   const handleInput = (tarif) => {
+    setWaiting(true);
     DelmonicosService
       .changeTariff(parseInt(tarif))
-      .then(() => getTariff())
+      .then(() => {
+        getTariff();
+        alert(`Le tarif a été mis à jour : ${newTarif}`);
+        setWaiting(false);
+      })
   };
 
   useEffect(() => getTariff(), []);
@@ -48,10 +54,10 @@ const ManageTariff = () => {
       <Container maxWidth={false}>
         <Box mt={3}>
           <p>Tarif actuelle pour les bornes Delmonicos : {tarif} €</p>
-          <p>Pour changer les tarifs veuillez le nouveau tarif ci dessous</p>
-          <input placeholder="nouveau tarif" onChange={(e) => setNewTarif(e.target.value)} value={newTarif} />
+          <p>&nbsp;</p>
+          <input disabled={waiting} placeholder="nouveau tarif" onChange={(e) => setNewTarif(e.target.value)} value={newTarif} />
+          <button style={{marginLeft: 5 + 'px'}} type="button" onClick={() => handleInput(newTarif)}>{!waiting ? "save" : "waiting..."}</button>
         </Box>
-        <button type="button" onClick={() => handleInput(newTarif)}>Input</button>
       </Container>
     </Page>
   );
