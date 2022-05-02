@@ -30,22 +30,24 @@ const CreateCharger = () => {
   const handleInput = (latitude, longitude) => {
     setWaiting(true);
     try {
-      KeyringService.generateNewChargerKey().then((chargerKeypair) => {
-        DelmonicosService
-          .addChargerLocation(latitude, longitude, chargerKeypair.chargerKeypair)
-          .then(() => {
-            return DelmonicosService.addNewCharger(chargerKeypair.address);
-          })
-          .then(() => {
-            console.log(`Charger ${chargerKeypair.address} added to the chain.`);
-            alert(`La nouvelle borne a été ajoutée.`);
-            setWaiting(false);
-          })
-          .catch((e)  => {
-            alert(e);
-            setWaiting(false);
+      cryptoWaitReady().then(() => {
+        KeyringService.generateNewChargerKey().then((chargerKeypair) => {
+          DelmonicosService
+            .addChargerLocation(latitude, longitude, chargerKeypair.chargerKeypair)
+            .then(() => {
+              return DelmonicosService.addNewCharger(chargerKeypair.address);
+            })
+            .then(() => {
+              console.log(`Charger ${chargerKeypair.address} added to the chain.`);
+              alert(`La nouvelle borne a été ajoutée.`);
+              setWaiting(false);
+            })
+            .catch((e)  => {
+              alert(e);
+              setWaiting(false);
+            });
           });
-        })
+        });
     } catch(e) {
       alert(e);
         setWaiting(false);
