@@ -17,116 +17,60 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const GetPayementConsent = (setPayementConsents) => {
-  const config = {
-    method: 'get',
-    url: 'https://bf5h52pjn2sju5jji4hz-elasticsearch.services.clever-cloud.com/payment-consent/_search',
-    headers: {
-      Origin: 'http://test.com',
-      Authorization: 'Basic dWVGanQ0S0hBNHR1bVRsTjRQbjg6OTFoNFMybVBqUTlKS1czWmN2MmE='
-    }
-  };
-
-  axios(config)
-    .then((response) => {
-      setPayementConsents(response.data.hits.hits);
-      console.log('Payement consent data is correctly recover');
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
-const GetPayement = (setPayement) => {
-  const config = {
+const GetPayement = () => {
+  return axios({
     method: 'get',
     url: 'https://bf5h52pjn2sju5jji4hz-elasticsearch.services.clever-cloud.com/payments/_search',
     headers: {
       Authorization: 'Basic dWVGanQ0S0hBNHR1bVRsTjRQbjg6OTFoNFMybVBqUTlKS1czWmN2MmE='
     }
-  };
-
-  axios(config)
-    .then((response) => {
-      setPayement(response.data.hits.hits);
-      console.log('Payement data is correctly recover');
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  });
 };
 
-const GetChargeSession = (setChargeSessions) => {
-  const config = {
+const GetChargeSession = () => {
+  return axios({
     method: 'get',
     url: 'https://bf5h52pjn2sju5jji4hz-elasticsearch.services.clever-cloud.com/charge-session/_search',
     headers: {
       Authorization: 'Basic dWVGanQ0S0hBNHR1bVRsTjRQbjg6OTFoNFMybVBqUTlKS1czWmN2MmE='
     }
-  };
-
-  axios(config)
-    .then((response) => {
-      setChargeSessions(response.data.hits.hits);
-      console.log('Charge session data is correctly recover');
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  });
 };
 
-const MapData = (payementConsents, payements, chargeSessions) => {
-  const cs = chargeSessions.map((_cs) => {
-    const p = payements.find((_p) => _p._source.session_id === _cs._source.session_id);
-    if (!p) {
-      return (0);
-    }
+const MapData = (payments, chargeSessions) => {
+  console.log(payments);
+  console.log(chargeSessions);
+
+  return [...new Set(chargeSessions.map((e) => e._source.user))].map((userId) => {
+    const userSessions = chargeSessions.filter((e) => e._source.user === userId);
+    const userPayments = payments.filter((e) => e._source.user === userId);
     return {
-      user: _cs._source.user,
-      charger: _cs._source.charger,
-      session_id: _cs._source.session_id,
-      kwh: _cs._source.kwh,
-      amount: p._source.amount?.amount,
-      duration: _cs._source.duration,
-      cs_timestamp: _cs._source.timestamp,
-      p_timestamp: p._source.timestamp?.p_timestamp,
+      id: userId,
+      nb_sessions: userSessions.length,
+      total_kwh: userSessions.reduce((pv, cv) => pv + cv._source.kwh, 0),
+      total_amount: userPayments.reduce((pv, cv) => pv + cv._source.amount / 1000, 0),
+      total_duration: userSessions.reduce((pv, cv) => pv + (cv._source.duration / 1000), 0)
     };
   });
-  const tmp = cs.map((_cs) => {
-    const pc = payementConsents.find((_pc) => _pc._source.user === _cs.user);
-    if (!pc) {
-      return (0);
-    }
-    return {
-      user: _cs.user,
-      charger: _cs.charger,
-      session_id: _cs.session_id,
-      kwh: _cs.kwh,
-      amount: _cs.amount,
-      duration: _cs.duration,
-      bic: pc._source.bic?.bic,
-      iban: pc._source.iban?.iban,
-      cs_timestamp: _cs.timestamp,
-      pc_timestamp: pc._source.timestamp?.pc_timestamp,
-      p_timestamp: _cs.timestamp,
-    };
-  });
-  return (tmp);
 };
 
 const CustomerListView = () => {
   const classes = useStyles();
-  const [payementConsents, setPayementConsents] = useState([]);
-  const [payements, setPayements] = useState([]);
-  const [chargeSessions, setChargeSessions] = useState([]);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
-    GetPayementConsent(setPayementConsents);
-    GetPayement(setPayements);
-    GetChargeSession(setChargeSessions);
+    Promise.all([
+      GetPayement(),
+      GetChargeSession()
+    ]).then((results) => {
+      setData(MapData(
+        results[0].data.hits.hits,
+        results[1].data.hits.hits
+      ));
+    }).catch((e) => {
+      console.log('Error: ', e);
+    });
   }, []);
-
-  const data = MapData(payementConsents, payements, chargeSessions);
 
   return (
     <Page
@@ -135,7 +79,7 @@ const CustomerListView = () => {
     >
       <Container maxWidth={false}>
         <Box mt={3}>
-          <Results customers={data} />
+          {data && <Results customers={data} />}
         </Box>
       </Container>
     </Page>

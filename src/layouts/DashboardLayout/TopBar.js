@@ -49,6 +49,7 @@ const TopBar = ({
               badgeContent={notifications.length}
               color="primary"
               variant="dot"
+              overlap="rectangular"
             >
               <NotificationsIcon />
             </Badge>

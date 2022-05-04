@@ -45,33 +45,45 @@ const Results = ({ className, customers, ...rest }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  User
+                  Identifiant utilisateur
                 </TableCell>
                 <TableCell>
-                  kwh
+                  Nombre total de sessions
                 </TableCell>
                 <TableCell>
-                  Amount
+                  Total des charges en kwh
                 </TableCell>
                 <TableCell>
-                  Duration
+                  Montant payé total
+                </TableCell>
+                <TableCell>
+                  Durée de charge totale
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers.slice(0, limit).map((customer) => (
-                <TableRow>
+              {customers && customers.slice(0, limit).map((customer) => (
+                <TableRow key={customer.id}>
                   <TableCell>
-                    {customer.user}
+                    {customer.id}
                   </TableCell>
                   <TableCell>
-                    {customer.kwh}
+                    {customer.nb_sessions}
                   </TableCell>
                   <TableCell>
-                    {customer.amount}
+                    {`${customer.total_kwh} kwh`}
                   </TableCell>
                   <TableCell>
-                    {customer.duration}
+                    {
+                      new Intl.NumberFormat('fr-FR', {
+                        style: 'currency',
+                        currency: 'EUR',
+                        minimumFractionDigits: 2
+                      }).format(customer.total_amount)
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {new Date(1000 * customer.total_duration).toISOString().substring(11, 19)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -79,15 +91,17 @@ const Results = ({ className, customers, ...rest }) => {
           </Table>
         </Box>
       </PerfectScrollbar>
-      <TablePagination
-        component="div"
-        count={customers.length}
-        onChangePage={handlePageChange}
-        onChangeRowsPerPage={handleLimitChange}
-        page={page}
-        rowsPerPage={limit}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
+      {customers && (
+        <TablePagination
+          component="div"
+          count={customers.length}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleLimitChange}
+          page={page}
+          rowsPerPage={limit}
+          rowsPerPageOptions={[5, 10, 25]}
+        />
+      )}
     </Card>
   );
 };

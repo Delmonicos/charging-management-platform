@@ -9,6 +9,7 @@ import Page from 'src/components/Page';
 
 import KeyringService from '../../../services/Keyring';
 import DelmonicosService from '../../../services/Delmonicos';
+import { cryptoWaitReady } from '@polkadot/util-crypto';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,17 +25,33 @@ const CreateCharger = () => {
   const [id, setId] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
+  const [waiting, setWaiting] = useState(false);
 
   const handleInput = (latitude, longitude) => {
-    const chargerKeypair = KeyringService.generateNewChargerKey();
-    DelmonicosService
-      .addChargerLocation(longitude, latitude, chargerKeypair.chargerKeypair)
-      .then(() => {
-        return DelmonicosService.addNewCharger(chargerKeypair.address);
-      })
-      .then(() => {
-        console.log(`Charger ${chargerKeypair.address} added to the chain.`);
-      });
+    setWaiting(true);
+    try {
+      cryptoWaitReady().then(() => {
+        KeyringService.generateNewChargerKey().then((chargerKeypair) => {
+          DelmonicosService
+            .addChargerLocation(latitude, longitude, chargerKeypair.chargerKeypair)
+            .then(() => {
+              return DelmonicosService.addNewCharger(chargerKeypair.address);
+            })
+            .then(() => {
+              console.log(`Charger ${chargerKeypair.address} added to the chain.`);
+              alert(`La nouvelle borne a été ajoutée.`);
+              setWaiting(false);
+            })
+            .catch((e)  => {
+              alert(e);
+              setWaiting(false);
+            });
+          });
+        });
+    } catch(e) {
+      alert(e);
+        setWaiting(false);
+    };
   };
 
   return (
@@ -44,15 +61,14 @@ const CreateCharger = () => {
     >
       <Container maxWidth={false}>
         <Box mt={3}>
-          <p>Afin d&apos;enregistrer une nouvelle borne veuillez renseigner les champs suivants.</p>
-          <p>Latitude du charger :</p>
-          <input placeholder="latitude de la borne" onChange={(e) => setLatitude(e.target.value)} />
-          <p>Longitude du charger :</p>
-          <input placeholder="longitude de la borne" onChange={(e) => setLongitude(e.target.value)} />
-        </Box>
-        <button type="button" onClick={() => handleInput(id, latitude, longitude)}>
-          <p>Créer la nouvelle borne</p>
+          <p>Afin d&apos;enregistrer une nouvelle borne veuillez renseigner les champs suivants :</p>
+          <p>&nbsp;</p>
+          <input  disabled={waiting} placeholder="latitude de la borne" onChange={(e) => setLatitude(e.target.value)} />
+          <input  disabled={waiting} style={{marginLeft: 5 + 'px'}}  placeholder="longitude de la borne" onChange={(e) => setLongitude(e.target.value)} />
+          <button style={{marginLeft: 5 + 'px'}}  type="button" onClick={() => handleInput(latitude, longitude)}>
+          <p style={{paddingLeft: 5 + 'px', paddingRight: 5 + 'px'}}>{!waiting ? "Ajouter la nouvelle borne " : "loading..."}</p>
         </button>
+        </Box>
       </Container>
     </Page>
   );
